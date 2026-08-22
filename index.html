@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>lvens — Photography</title>
+<meta name="description" content="lvens — personal photography hobby gallery, shot on a POCO M6 Pro.">
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Inter:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+:root{
+  --bg:#0c0c0b;
+  --bg-raised:#151412;
+  --ink:#f1ede3;
+  --muted:rgba(241,237,227,.58);
+  --faint:rgba(241,237,227,.26);
+  --rule:rgba(241,237,227,.10);
+  --accent:#6d8f80;
+  --accent-ink:#0c0c0b;
+  --ease:cubic-bezier(.22,.85,.32,1);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{animation-duration:.001ms!important;transition-duration:.001ms!important}}
+::selection{background:var(--accent);color:var(--accent-ink)}
+html{scrollbar-color:var(--faint) transparent;scrollbar-width:thin}
+::-webkit-scrollbar{width:10px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--rule);border-radius:6px;border:2px solid var(--bg)}
+body{background:var(--bg);color:var(--ink);font-family:'Inter',system-ui,sans-serif;font-weight:300;line-height:1.5;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;z-index:90;pointer-events:none;opacity:.035;mix-blend-mode:overlay;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+a{color:inherit;text-decoration:none}
+img{display:block;max-width:100%;-webkit-user-drag:none;user-select:none;-webkit-user-select:none}
+.tile img,.hero-media img,.about-media img,.lightbox img{pointer-events:none}
+.tile,.hero-media,.about-media,.lightbox{-webkit-touch-callout:none}
+.eyebrow{font-family:'IBM Plex Mono',monospace;font-size:.68rem;letter-spacing:.22em;text-transform:uppercase;color:var(--muted)}
+.serif{font-family:'Fraunces',serif}
+
+.topbar{position:fixed;top:0;left:0;right:0;z-index:60;display:flex;align-items:center;justify-content:space-between;padding:1.6rem clamp(1.2rem,4vw,3rem);mix-blend-mode:difference}
+.wordmark{font-family:'Fraunces',serif;font-size:1.05rem;letter-spacing:.08em;font-weight:500}
+.menu-btn{cursor:pointer;background:none;border:0;display:flex;flex-direction:column;gap:6px;width:34px;padding:6px 0;color:var(--ink)}
+.menu-btn span{display:block;height:1px;width:100%;background:var(--ink);transition:transform .4s var(--ease),opacity .3s var(--ease)}
+.menu-btn .menu-label{font-family:'IBM Plex Mono',monospace;font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;margin-top:2px;height:auto;background:none}
+.nav-open .menu-btn span:nth-child(1){transform:translateY(3.5px) rotate(45deg)}
+.nav-open .menu-btn span:nth-child(2){transform:translateY(-3.5px) rotate(-45deg)}
+.nav-overlay{position:fixed;inset:0;z-index:50;background:var(--bg);display:flex;align-items:center;padding:clamp(1.5rem,6vw,5rem);opacity:0;visibility:hidden;transition:opacity .55s var(--ease),visibility 0s linear .55s}
+.nav-open .nav-overlay{opacity:1;visibility:visible;transition:opacity .55s var(--ease)}
+.nav-links{list-style:none}.nav-links li{overflow:hidden}.nav-links a{display:inline-block;font-family:'Fraunces',serif;font-weight:300;font-size:clamp(2.4rem,8vw,5.4rem);line-height:1.14;color:var(--faint);transform:translateY(110%);transition:transform .6s var(--ease),color .3s var(--ease);position:relative}
+.nav-open .nav-links a{transform:translateY(0)}.nav-links li:nth-child(1) a{transition-delay:.05s}.nav-links li:nth-child(2) a{transition-delay:.1s}.nav-links li:nth-child(3) a{transition-delay:.15s}.nav-links a:hover,.nav-links a:focus-visible{color:var(--ink)}
+.nav-meta{margin-top:3rem;display:flex;gap:2.4rem;flex-wrap:wrap}.nav-meta a{font-family:'IBM Plex Mono',monospace;font-size:.72rem;letter-spacing:.08em;color:var(--muted);border-bottom:1px solid var(--rule);padding-bottom:2px}.nav-meta a:hover{color:var(--accent);border-color:var(--accent)}
+
+.hero{position:relative;height:100svh;min-height:560px;display:flex;flex-direction:column;justify-content:flex-end;padding:clamp(1.5rem,5vw,3.5rem);isolation:isolate}
+.hero-media{position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(12,12,11,.15) 0%,rgba(12,12,11,.75) 82%,var(--bg) 100%),linear-gradient(135deg,#23231f,#0c0c0b 70%)}
+.hero-media img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0;z-index:-2;opacity:0;filter:blur(14px) saturate(.9);transform:scale(1.04);transition:opacity 1.3s var(--ease),filter 1.3s var(--ease),transform 1.6s var(--ease)}
+.hero-media img.loaded{opacity:1;filter:blur(0) saturate(1);transform:scale(1)}
+.hero-media.ph::before{content:'HERO — IMAGES/HERO.JPG';position:absolute;inset:0;z-index:-2;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:.7rem;letter-spacing:.15em;color:var(--faint)}
+.hero-content{max-width:980px}.hero-title{font-family:'Fraunces',serif;font-weight:300;font-size:clamp(2.6rem,7.4vw,6.4rem);line-height:1.02;letter-spacing:-.01em}.hero-title em{font-style:italic;color:var(--accent);font-weight:400}.hero-sub{margin-top:1.4rem;max-width:36ch;color:var(--muted);font-size:1.02rem;font-weight:300}
+.scroll-cue{position:absolute;right:clamp(1.5rem,5vw,3.5rem);bottom:2.2rem;writing-mode:vertical-rl;font-family:'IBM Plex Mono',monospace;font-size:.66rem;letter-spacing:.2em;color:var(--muted);display:flex;align-items:center;gap:.8rem}.scroll-cue::after{content:'';width:1px;height:40px;background:var(--faint);animation:cue 2.4s var(--ease) infinite}@keyframes cue{0%{transform:scaleY(0);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}51%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+
+section{padding:clamp(4.5rem,10vw,7.5rem) clamp(1.5rem,5vw,3.5rem)}
+.section-head{display:flex;align-items:flex-end;justify-content:space-between;gap:2rem;flex-wrap:wrap;border-bottom:1px solid var(--rule);padding-bottom:1.6rem;margin-bottom:clamp(2.5rem,6vw,4rem)}
+.section-head h2{font-family:'Fraunces',serif;font-weight:300;font-size:clamp(2rem,4.4vw,3.1rem)}.section-head .count{font-family:'IBM Plex Mono',monospace;font-size:.72rem;color:var(--muted);letter-spacing:.08em}
+.reveal{opacity:0;transform:translateY(28px);transition:opacity .8s var(--ease),transform .8s var(--ease)}.reveal.in{opacity:1;transform:translateY(0)}
+
+.grid{column-count:3;column-gap:clamp(1.6rem,3.2vw,3rem)}
+.tile{position:relative;overflow:hidden;cursor:pointer;background:var(--bg-raised);break-inside:avoid;margin-bottom:clamp(1.6rem,3.2vw,3rem);display:block}.tile img{width:100%;height:auto;opacity:0;filter:blur(10px);transform:scale(1.015);transition:opacity .9s var(--ease),filter .9s var(--ease),transform .9s var(--ease)}.tile img.loaded{opacity:1;filter:blur(0);transform:scale(1)}.tile:hover img.loaded{transform:scale(1.035)}.tile{cursor:pointer}
+.tile .ph{width:100%;aspect-ratio:4/5;display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-size:2.4rem;color:var(--faint);background:linear-gradient(150deg,#1a1a17,#0c0c0b)}
+.tile .cap{position:absolute;left:0;right:0;bottom:0;padding:1.1rem 1.2rem;background:linear-gradient(0deg,rgba(0,0,0,.76),transparent);transform:translateY(60%);opacity:0;transition:transform .4s var(--ease),opacity .4s var(--ease)}.tile:hover .cap,.tile:focus-visible .cap{transform:translateY(0);opacity:1}.cap .title{font-family:'Fraunces',serif;font-size:1.15rem;font-style:italic}.cap .exif{margin-top:.35rem;font-family:'IBM Plex Mono',monospace;font-size:.66rem;letter-spacing:.05em;color:var(--muted)}
+.grid-status{font-family:'IBM Plex Mono',monospace;font-size:.66rem;letter-spacing:.08em;color:var(--faint);text-align:center;padding:1rem 0 0}
+.gallery-error{padding:2rem;border:1px solid var(--rule);color:var(--muted);font-family:'IBM Plex Mono',monospace;font-size:.75rem;line-height:1.8}
+
+@media (max-width:900px){.grid{column-count:2}}@media (max-width:560px){.grid{column-count:1}}
+
+.about{display:grid;grid-template-columns:.85fr 1.15fr;gap:clamp(2rem,6vw,5rem);align-items:center}.about-media{position:relative;aspect-ratio:4/5;background:linear-gradient(150deg,#1a1a17,#0c0c0b);overflow:hidden}.about-media img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;filter:blur(12px);transform:scale(1.03);transition:opacity 1s var(--ease),filter 1s var(--ease),transform 1.2s var(--ease)}.about-media img.loaded{opacity:1;filter:blur(0);transform:scale(1)}.about-media .ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:.68rem;letter-spacing:.15em;color:var(--faint)}.about-text p{max-width:52ch;color:var(--muted);font-size:1.05rem;margin-bottom:1.3rem}.about-text p:first-of-type{color:var(--ink);font-size:1.25rem;font-family:'Fraunces',serif;font-weight:300;line-height:1.45}.stat-row{display:flex;gap:clamp(1.6rem,4vw,3rem);margin-top:2.4rem;padding-top:2rem;border-top:1px solid var(--rule);flex-wrap:wrap}.stat b{display:block;font-family:'Fraunces',serif;font-size:1.6rem;font-weight:400}.stat span{font-family:'IBM Plex Mono',monospace;font-size:.64rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+
+.contact{text-align:center}.contact-email{font-family:'Fraunces',serif;font-weight:300;font-size:clamp(1.9rem,6vw,4rem);display:inline-block;position:relative;padding-bottom:.4rem}.contact-email::after{content:'';position:absolute;left:0;right:0;bottom:0;height:1px;background:var(--faint);transition:background .4s var(--ease)}.contact-email:hover::after{background:var(--accent)}.contact-sub{margin-top:1rem;color:var(--muted);font-size:.95rem}.social-row{margin-top:2.6rem;display:flex;gap:1.8rem;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase}.social-row a{color:var(--muted);border-bottom:1px solid transparent;padding-bottom:2px}.social-row a:hover{color:var(--accent);border-color:var(--accent)}
+footer{display:flex;align-items:center;justify-content:space-between;padding:1.8rem clamp(1.5rem,5vw,3.5rem) 2.4rem;border-top:1px solid var(--rule);font-family:'IBM Plex Mono',monospace;font-size:.65rem;letter-spacing:.08em;color:var(--faint);flex-wrap:wrap;gap:.8rem}footer a{color:var(--faint)}footer a:hover{color:var(--accent)}
+
+#preloader{position:fixed;inset:0;z-index:200;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.4rem;transition:opacity .7s var(--ease),visibility 0s linear .7s}#preloader .pl-word{font-family:'Fraunces',serif;font-size:1.3rem;letter-spacing:.08em;font-weight:500}#preloader .pl-bar{width:min(220px,60vw);height:1px;background:var(--rule);position:relative;overflow:hidden}#preloader .pl-bar-fill{position:absolute;left:0;top:0;bottom:0;width:0;background:var(--accent);transition:width .25s var(--ease)}#preloader .pl-pct{font-family:'IBM Plex Mono',monospace;font-size:.68rem;letter-spacing:.14em;color:var(--muted);font-variant-numeric:tabular-nums}body.pl-done #preloader{opacity:0;visibility:hidden;pointer-events:none}body:not(.pl-done) #page{opacity:0}#page{opacity:1;transition:opacity .9s var(--ease)}
+
+.lightbox{position:fixed;inset:0;z-index:80;background:rgba(8,8,7,.94);display:flex;align-items:center;justify-content:center;padding:3rem;opacity:0;visibility:hidden;transition:opacity .35s var(--ease),visibility 0s linear .35s}.lightbox.on{opacity:1;visibility:visible;transition:opacity .35s var(--ease)}.lightbox img{max-width:100%;max-height:100%;object-fit:contain;box-shadow:0 30px 80px rgba(0,0,0,.6)}.lightbox-nav{position:absolute;top:50%;transform:translateY(-50%);width:44px;height:44px;border:1px solid var(--rule);background:rgba(12,12,11,.38);color:var(--ink);display:flex;align-items:center;justify-content:center;cursor:pointer;font-family:'IBM Plex Mono',monospace;font-size:.85rem;transition:background .25s var(--ease),border-color .25s var(--ease),transform .25s var(--ease);z-index:2}.lightbox-nav:hover,.lightbox-nav:focus-visible{background:rgba(241,237,227,.1);border-color:var(--faint)}.lightbox-prev{left:clamp(1rem,3vw,2.5rem)}.lightbox-next{right:clamp(1rem,3vw,2.5rem)}@media(max-width:700px){.lightbox{padding:3.5rem 3.2rem}.lightbox-nav{width:38px;height:38px}.lightbox-prev{left:.7rem}.lightbox-next{right:.7rem}}
+.lightbox-close{position:absolute;top:1.8rem;right:clamp(1.5rem,5vw,3rem);background:none;border:0;color:var(--ink);cursor:pointer;font-family:'IBM Plex Mono',monospace;font-size:.7rem;letter-spacing:.14em}.lightbox-cap{position:absolute;left:0;right:0;bottom:1.8rem;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:.68rem;color:var(--muted);letter-spacing:.06em}
+
+@media (max-width:700px){.about{grid-template-columns:1fr}.about-media{max-width:620px}.lightbox{padding:1rem}.lightbox img{max-height:82vh}}
+</style>
+</head>
+<body>
+
+<div id="preloader" aria-hidden="true">
+  <div class="pl-word">LVENS</div>
+  <div class="pl-bar"><div class="pl-bar-fill" id="plFill"></div></div>
+  <div class="pl-pct" id="plPct">Loading 0%</div>
+</div>
+
+<div id="page">
+  <div class="topbar">
+    <a href="#top" class="wordmark">LVENS</a>
+    <button class="menu-btn" id="menuBtn" aria-label="Open menu" aria-expanded="false">
+      <span></span><span></span><span class="menu-label">Menu</span>
+    </button>
+  </div>
+
+  <nav class="nav-overlay" id="navOverlay" aria-label="Main navigation">
+    <div>
+      <ul class="nav-links">
+        <li><a href="#work">Work</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+      <div class="nav-meta">
+        <a href="mailto:xovriet@gmail.com">xovriet@gmail.com</a>
+        <a href="https://instagram.com/Xovriet" target="_blank" rel="noopener">Instagram</a>
+      </div>
+    </div>
+  </nav>
+
+  <header class="hero" id="top">
+    <div class="hero-media ph" id="heroMedia">
+      <img data-src="images/hero.jpg" alt="Featured work" id="heroImg">
+    </div>
+    <div class="hero-content">
+      <p class="eyebrow">Photography — For Fun</p>
+      <h1 class="hero-title">Lvens is a study in <em>light</em>,<br>held still.</h1>
+      <p class="hero-sub">A hobbyist eye, one year in. Shot on a POCO M6 Pro, still learning as I go.</p>
+    </div>
+    <div class="scroll-cue">SCROLL</div>
+  </header>
+
+  <section id="work">
+    <div class="section-head reveal">
+      <h2>Work</h2>
+      <span class="count" id="workCount">Loading gallery · Shot on POCO M6 Pro</span>
+    </div>
+    <div class="grid" id="workGrid" aria-live="polite"></div>
+    <div class="grid-status" id="gridStatus"></div>
+  </section>
+
+  <section id="about">
+    <div class="about">
+      <div class="about-media reveal">
+        <div class="ph">IMAGES/ABOUT.JPG</div>
+        <img data-src="images/about.jpg" alt="About lvens">
+      </div>
+      <div class="about-text reveal">
+        <p class="eyebrow" style="margin-bottom:1rem;">About</p>
+        <p>Been shooting for about a year now, just on my phone, purely as a hobby.</p>
+        <p>Still improving — next up is getting an actual camera and working on my editing, both need work. Short term I want to travel more and shoot in Europe, Australia, and New Zealand.</p>
+        <div class="stat-row">
+          <div class="stat"><b>1</b><span>Year shooting</span></div>
+          <div class="stat"><b id="photoStat">—</b><span>Photos shared</span></div>
+          <div class="stat"><b>∞</b><span>Still learning</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="contact" class="contact">
+    <p class="eyebrow reveal">Say Hi</p>
+    <a href="mailto:xovriet@gmail.com" class="contact-email reveal">xovriet@gmail.com</a>
+    <p class="contact-sub reveal">Just a hobbyist sharing the journey — feel free to reach out or follow along.</p>
+    <div class="social-row reveal"><a href="https://instagram.com/Xovriet" target="_blank" rel="noopener">Instagram</a></div>
+  </section>
+
+  <footer>
+    <span>&copy; <span id="year"></span> Lvens</span>
+    <a href="#top">Back to top ↑</a>
+  </footer>
+
+  <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Photo viewer">
+    <button class="lightbox-nav lightbox-prev" id="lbPrev" aria-label="Previous photo">←</button>
+    <button class="lightbox-nav lightbox-next" id="lbNext" aria-label="Next photo">→</button>
+    <button class="lightbox-close" id="lbClose">CLOSE ✕</button>
+    <img id="lbImg" src="" alt="">
+    <div class="lightbox-cap" id="lbCap"></div>
+  </div>
+</div>
+
+<script>
+(function(){
+  'use strict';
+
+  var REPO_API = 'https://api.github.com/repos/G56XS/Photography/git/trees/main?recursive=1';
+  var IMAGE_PREFIX = 'images/';
+  var HERO_FILE = 'hero.jpg';
+  var ABOUT_FILE = 'about.jpg';
+
+  var menuBtn = document.getElementById('menuBtn');
+  var grid = document.getElementById('workGrid');
+  var workCount = document.getElementById('workCount');
+  var gridStatus = document.getElementById('gridStatus');
+  var photoStat = document.getElementById('photoStat');
+  var heroImg = document.getElementById('heroImg');
+  var heroMedia = document.getElementById('heroMedia');
+  var aboutImg = document.querySelector('.about-media img');
+  var aboutMedia = document.querySelector('.about-media');
+  var lightbox = document.getElementById('lightbox');
+  var lbImg = document.getElementById('lbImg');
+  var lbCap = document.getElementById('lbCap');
+  var lbClose = document.getElementById('lbClose');
+  var plFill = document.getElementById('plFill');
+  var plPct = document.getElementById('plPct');
+
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  menuBtn.addEventListener('click', function(){
+    var open = document.body.classList.toggle('nav-open');
+    menuBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    menuBtn.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+  });
+
+  document.querySelectorAll('.nav-links a').forEach(function(a){
+    a.addEventListener('click', function(){
+      document.body.classList.remove('nav-open');
+      menuBtn.setAttribute('aria-expanded','false');
+      menuBtn.setAttribute('aria-label','Open menu');
+    });
+  });
+
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape'){
+      document.body.classList.remove('nav-open');
+      menuBtn.setAttribute('aria-expanded','false');
+      menuBtn.setAttribute('aria-label','Open menu');
+      closeLightbox();
+      return;
+    }
+    if(lightbox.classList.contains('on')){
+      if(e.key === 'ArrowLeft') openAdjacent(-1);
+      if(e.key === 'ArrowRight') openAdjacent(1);
+    }
+  });
+
+  var imgCache = Object.create(null);
+  function preload(src){
+    return new Promise(function(resolve){
+      if(imgCache[src] === true || imgCache[src] === false){ resolve(imgCache[src]); return; }
+      var test = new Image();
+      test.onload = function(){ imgCache[src] = true; resolve(true); };
+      test.onerror = function(){ imgCache[src] = false; resolve(false); };
+      test.src = src;
+    });
+  }
+
+  function applyLoaded(imgEl){
+    var src = imgEl.getAttribute('data-src');
+    if(!src || imgCache[src] === false) return false;
+    imgEl.src = src;
+    imgEl.classList.add('loaded');
+    return true;
+  }
+
+  function safeFileName(path){
+    return path.split('/').pop();
+  }
+
+  function isPhotoPath(path){
+    return /^images\/[^/]+\.(jpe?g|png|webp|gif|avif)$/i.test(path);
+  }
+
+  function sortPhotos(files){
+    return files.sort(function(a,b){
+      return a.localeCompare(b, undefined, {numeric:true, sensitivity:'base'});
+    });
+  }
+
+  function makePhotoLabel(index){
+    return 'lvens — ' + String(index).padStart(3,'0');
+  }
+
+  var galleryItems = [];
+  var currentPhotoIndex = -1;
+
+  function createTile(file, index){
+    var number = index + 1;
+    var num = String(number).padStart(3,'0');
+    var label = makePhotoLabel(number);
+    var src = IMAGE_PREFIX + safeFileName(file);
+
+    var tile = document.createElement('div');
+    tile.className = 'tile';
+    tile.tabIndex = 0;
+    tile.setAttribute('role','button');
+    tile.setAttribute('aria-label','View ' + label);
+
+    var ph = document.createElement('div');
+    ph.className = 'ph';
+    ph.textContent = num;
+
+    var img = document.createElement('img');
+    img.setAttribute('data-src', src);
+    img.alt = label;
+    img.decoding = 'async';
+    img.draggable = false;
+
+    var cap = document.createElement('div');
+    cap.className = 'cap';
+    cap.innerHTML = '<div class="title">' + label + '</div>';
+
+    tile.appendChild(ph);
+    tile.appendChild(img);
+    tile.appendChild(cap);
+    grid.appendChild(tile);
+
+    var item = {file:file, index:index, number:number, label:label, src:src, tile:tile, img:img};
+    galleryItems.push(item);
+
+    function open(){ openLightbox(index); }
+
+    tile.addEventListener('click', open);
+    tile.addEventListener('keydown', function(e){
+      if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); open(); }
+    });
+
+    return item;
+  }
+
+  function openLightbox(index, updateHash){
+    if(!galleryItems.length) return;
+    if(index < 0) index = galleryItems.length - 1;
+    if(index >= galleryItems.length) index = 0;
+    var item = galleryItems[index];
+    if(imgCache[item.src] === false) return;
+
+    currentPhotoIndex = index;
+    lbImg.src = item.src;
+    lbImg.alt = item.label;
+    lbCap.textContent = item.label;
+    lightbox.classList.add('on');
+    document.body.style.overflow = 'hidden';
+
+    if(updateHash !== false){
+      history.replaceState(null, '', '#photo-' + String(item.number).padStart(3,'0'));
+    }
+  }
+
+  function openAdjacent(direction){
+    if(currentPhotoIndex < 0) return;
+    openLightbox(currentPhotoIndex + direction);
+  }
+
+  function closeLightbox(){
+    if(!lightbox.classList.contains('on')) return;
+    lightbox.classList.remove('on');
+    lbImg.removeAttribute('src');
+    document.body.style.overflow = '';
+    currentPhotoIndex = -1;
+    if(location.hash.indexOf('#photo-') === 0){
+      history.replaceState(null, '', location.pathname + location.search);
+    }
+  }
+
+  lbClose.addEventListener('click', closeLightbox);
+  document.getElementById('lbPrev').addEventListener('click', function(e){ e.stopPropagation(); openAdjacent(-1); });
+  document.getElementById('lbNext').addEventListener('click', function(e){ e.stopPropagation(); openAdjacent(1); });
+  lightbox.addEventListener('click', function(e){ if(e.target === lightbox) closeLightbox(); });
+
+  function revealOnScroll(){
+    var els = document.querySelectorAll('.reveal');
+    if(!('IntersectionObserver' in window)){
+      els.forEach(function(el){el.classList.add('in')});
+      return;
+    }
+    var observer = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){ if(entry.isIntersecting){ entry.target.classList.add('in'); observer.unobserve(entry.target); } });
+    }, {threshold:.08, rootMargin:'0px 0px -40px 0px'});
+    els.forEach(function(el){observer.observe(el)});
+  }
+
+  function loadFixedImages(){
+    return Promise.all([
+      preload('images/' + HERO_FILE).then(function(ok){
+        if(ok){ applyLoaded(heroImg); heroMedia.classList.remove('ph'); }
+      }),
+      preload('images/' + ABOUT_FILE).then(function(ok){
+        if(ok){ applyLoaded(aboutImg); aboutMedia.querySelector('.ph').style.display = 'none'; }
+      })
+    ]);
+  }
+
+  function setProgress(done,total){
+    var pct = total ? Math.round((done / total) * 100) : 100;
+    plFill.style.width = pct + '%';
+    plPct.textContent = 'Loading ' + pct + '%';
+  }
+
+  async function loadGallery(){
+    try{
+      setProgress(5,100);
+      var response = await fetch(REPO_API, {headers:{'Accept':'application/vnd.github+json'}});
+      if(!response.ok) throw new Error('GitHub returned HTTP ' + response.status);
+      var tree = await response.json();
+      if(tree.truncated) throw new Error('GitHub returned a truncated file tree.');
+
+      var photos = tree.tree
+        .filter(function(item){ return item.type === 'blob' && isPhotoPath(item.path); })
+        .map(function(item){ return item.path; })
+        .filter(function(path){
+          var file = safeFileName(path).toLowerCase();
+          return file !== HERO_FILE && file !== ABOUT_FILE;
+        });
+
+      photos = sortPhotos(photos);
+      photoStat.textContent = photos.length;
+      workCount.textContent = '01 — ' + String(photos.length).padStart(2,'0') + ' · Shot on POCO M6 Pro';
+
+      if(!photos.length){
+        grid.innerHTML = '<div class="gallery-error">No gallery images were found in /images.</div>';
+        gridStatus.textContent = '';
+        return;
+      }
+
+      galleryItems = [];
+      var tiles = photos.map(createTile);
+      var done = 0;
+      setProgress(10,100);
+
+      /* Load in small batches so a larger gallery does not hammer the browser. */
+      var batchSize = 8;
+      for(var i = 0; i < tiles.length; i += batchSize){
+        var batch = tiles.slice(i, i + batchSize);
+        await Promise.all(batch.map(function(item){
+          return preload(item.src).then(function(ok){
+            done += 1;
+            if(ok) applyLoaded(item.img);
+            setProgress(10 + Math.round((done / photos.length) * 88),100);
+          });
+        }));
+      }
+
+      gridStatus.textContent = photos.length + ' photographs · discovered automatically from /images · fully loaded';
+
+      var match = location.hash.match(/^#photo-(\d+)$/i);
+      if(match){
+        var target = parseInt(match[1], 10) - 1;
+        if(target >= 0 && target < galleryItems.length){
+          setTimeout(function(){ openLightbox(target, false); }, 120);
+        }
+      }
+    }catch(error){
+      console.error(error);
+      workCount.textContent = 'Gallery unavailable';
+      grid.innerHTML = '<div class="gallery-error">The gallery could not read the image list from GitHub.<br>Check your connection or GitHub API availability, then refresh the page.</div>';
+    }
+  }
+
+  async function init(){
+    revealOnScroll();
+    setProgress(0,100);
+    await Promise.all([loadFixedImages(), loadGallery()]);
+    setProgress(100,100);
+    setTimeout(function(){ document.body.classList.add('pl-done'); }, 180);
+  }
+
+  init();
+})();
+</script>
+</body>
+</html>
