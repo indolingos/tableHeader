@@ -10,6 +10,7 @@ class Shipment extends MY_Controller {
         parent::__construct();
         $this->load->database();
         $this->load->model('Shipment_model');
+        $this->load->model('Transaction_model');
         $this->load->helper('url');
         $this->load->library('form_validation');
     }
@@ -53,8 +54,94 @@ class Shipment extends MY_Controller {
     {
         if (!$this->_require_admin()) return;
 
-        $data['username'] = $this->username;
+        $all_trx = $this->Transaction_model->get_all();
+        $shippable = array();
+        foreach ($all_trx as $t) {
+            if ($t['e_status'] !== 'Dibatalkan') {
+                $shippable[] = array(
+                    'id_transaction' => $t['id_transaction'],
+                    'i_invoice'      => $t['i_invoice'],
+                    'i_username'     => $t['i_username'],
+                    'e_status'       => $t['e_status'],
+                );
+            }
+        }
+
+        $data['username']     = $this->username;
+        $data['couriers']     = $this->Shipment_model->get_couriers();
+        $data['transactions'] = $shippable;
         $this->load->view('shipment_list', $data);
+    }
+
+    // Dipanggil saat admin memilih transaksi di form "Tambah Pengiriman":
+    // isi daftar barang transaksi tsb supaya qty kirim bisa disesuaikan.
+    public function transaction_items($id_transaction = null)
+    {
+        if (!$this->_require_ajax()) return;
+        if (!$this->_require_admin()) return;
+
+        $rows = $this->Transaction_model->get_detail((int) $id_transaction);
+        $this->_json(array('status' => true, 'data' => $rows));
+    }
+
+    // Simpan pengiriman baru (header + barang yang dikirim) untuk sebuah transaksi
+    public function create()
+    {
+        if (!$this->_require_ajax()) return;
+        if (!$this->_require_admin()) return;
+
+        $this->form_validation->set_rules('id_transaction', 'Transaksi', 'required|integer');
+        $this->form_validation->set_rules('id_courier', 'Kurir', 'required|integer');
+        $this->form_validation->set_rules('i_resi', 'No Resi', 'required|trim|max_length[50]');
+
+        $items = $this->input->post('items');
+        if (!$this->form_validation->run() || empty($items) || !is_array($items)) {
+            $this->_json(array(
+                'status'  => false,
+                'message' => empty($items) ? 'Minimal harus ada 1 barang yang dikirim.' : strip_tags(validation_errors()),
+            ), 422);
+            return;
+        }
+
+        $status = trim((string) $this->input->post('e_status_kirim'));
+        if (!in_array($status, $this->_valid_status, true)) {
+            $status = 'Dikemas';
+        }
+
+        $header = array(
+            'id_transaction' => (int) $this->input->post('id_transaction'),
+            'id_courier'     => (int) $this->input->post('id_courier'),
+            'i_resi'         => trim((string) $this->input->post('i_resi')),
+            'e_status_kirim' => $status,
+            'e_keterangan'   => trim((string) $this->input->post('e_keterangan')) ?: null,
+        );
+        if ($status === 'Dikirim') {
+            $header['dt_kirim'] = date('Y-m-d H:i:s');
+        } elseif ($status === 'Diterima') {
+            $header['dt_kirim'] = date('Y-m-d H:i:s');
+            $header['dt_diterima'] = date('Y-m-d H:i:s');
+        }
+
+        $id_shipment = $this->Shipment_model->insert_header($header);
+
+        foreach ($items as $item) {
+            $id_product = (int) ($item['id_product'] ?? 0);
+            $qty        = (int) ($item['qty'] ?? 0);
+            if ($id_product <= 0 || $qty <= 0) continue;
+
+            $this->Shipment_model->insert_detail(array(
+                'id_shipment' => $id_shipment,
+                'id_product'  => $id_product,
+                'n_qty'       => $qty,
+                'e_keterangan' => null,
+            ));
+        }
+
+        $this->_json(array(
+            'status'      => true,
+            'message'     => 'Pengiriman berhasil dibuat.',
+            'id_shipment' => $id_shipment,
+        ));
     }
 
     public function list_data()

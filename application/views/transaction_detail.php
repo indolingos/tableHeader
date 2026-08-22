@@ -142,8 +142,15 @@
     <!-- Nested table 2: histori pengiriman -->
     <div class="card">
         <div class="card-body">
-            <h6 class="mb-1"><i class="bi bi-truck me-2"></i>Histori Pengiriman</h6>
-            <p class="text-muted small">Keterangan: satu transaksi bisa memiliki lebih dari satu pengiriman jika barang dikirim bertahap.</p>
+            <div class="d-flex justify-content-between align-items-start gap-2 mb-1">
+                <div>
+                    <h6 class="mb-1"><i class="bi bi-truck me-2"></i>Histori Pengiriman</h6>
+                    <p class="text-muted small mb-0">Keterangan: satu transaksi bisa memiliki lebih dari satu pengiriman jika barang dikirim bertahap.</p>
+                </div>
+                <a class="btn btn-primary btn-sm text-nowrap" id="btnAddShipment" target="_blank">
+                    <i class="bi bi-plus-lg me-1"></i>Tambah Pengiriman
+                </a>
+            </div>
             <div class="table-responsive">
                 <table class="table table-sm table-hover align-middle mb-0">
                     <thead class="table-light">
@@ -184,6 +191,8 @@ $(function () {
     function showAlert(message, type) {
         $('#alertPlaceholder').html('<div class="alert alert-' + type + ' alert-dismissible fade show">' + message + '<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>');
     }
+
+    $('#btnAddShipment').attr('href', '<?= site_url('shipment'); ?>?id_transaction=' + ID_TRX);
 
     $('#hdrSubtotal').text(formatRupiah(<?= (float) $trx['v_subtotal']; ?>));
     $('#hdrTax').text(formatRupiah(<?= (float) $trx['v_tax']; ?>));

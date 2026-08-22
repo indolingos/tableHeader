@@ -23,8 +23,17 @@
     <div class="card">
         <div class="card-body">
 
-            <h5 class="mb-1"><i class="bi bi-box-seam-fill me-2"></i>Bukti Barang Terkirim</h5>
-            <p class="text-muted small">Keterangan: daftar pengiriman barang ke konsumen beserta nomor resi dan status. Klik ikon mata untuk melihat rincian barang yang dikirim dan mengunggah/ubah bukti kirim.</p>
+            <div class="d-flex flex-wrap justify-content-between align-items-start mb-1 gap-2">
+                <div>
+                    <h5 class="mb-1"><i class="bi bi-box-seam-fill me-2"></i>Bukti Barang Terkirim</h5>
+                    <p class="text-muted small mb-0">Keterangan: daftar pengiriman barang ke konsumen beserta nomor resi dan status. Klik ikon mata untuk melihat rincian barang yang dikirim dan mengunggah/ubah bukti kirim.</p>
+                </div>
+                <button type="button" class="btn btn-primary btn-sm text-nowrap" data-bs-toggle="modal" data-bs-target="#addShipModal">
+                    <i class="bi bi-plus-lg me-1"></i>Tambah Pengiriman
+                </button>
+            </div>
+
+            <div id="alertPlaceholder" class="mt-2"></div>
 
             <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0">
@@ -50,6 +59,86 @@
                 </table>
             </div>
 
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Tambah Pengiriman -->
+<div class="modal fade" id="addShipModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="bi bi-plus-lg me-2"></i>Tambah Pengiriman</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="addShipAlert"></div>
+                <div class="row g-3">
+                    <div class="col-12">
+                        <label class="form-label small fw-semibold">Transaksi</label>
+                        <select class="form-select" id="shipTrx">
+                            <option value="">-- Pilih Transaksi --</option>
+                            <?php foreach ($transactions as $t): ?>
+                            <option value="<?= (int) $t['id_transaction']; ?>">
+                                <?= htmlspecialchars($t['i_invoice']); ?> - <?= htmlspecialchars($t['i_username']); ?> (<?= htmlspecialchars($t['e_status']); ?>)
+                            </option>
+                            <?php endforeach; ?>
+                        </select>
+                        <div class="form-text">Hanya menampilkan transaksi yang belum dibatalkan.</div>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <label class="form-label small fw-semibold">Kurir</label>
+                        <select class="form-select" id="shipCourier">
+                            <option value="">-- Pilih Kurir --</option>
+                            <?php foreach ($couriers as $c): ?>
+                            <option value="<?= (int) $c['id_courier']; ?>"><?= htmlspecialchars($c['e_courier_name']); ?> (<?= htmlspecialchars($c['e_courier_code']); ?>)</option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <label class="form-label small fw-semibold">No Resi</label>
+                        <input type="text" class="form-control" id="shipResi" placeholder="mis. JNE1234567890">
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <label class="form-label small fw-semibold">Status Pengiriman</label>
+                        <select class="form-select" id="shipStatus">
+                            <option value="Dikemas" selected>Dikemas</option>
+                            <option value="Dikirim">Dikirim</option>
+                            <option value="Diterima">Diterima</option>
+                            <option value="Retur">Retur</option>
+                        </select>
+                    </div>
+
+                    <div class="col-12">
+                        <hr>
+                        <label class="form-label small fw-semibold">Barang yang Dikirim</label>
+                        <div class="table-responsive">
+                            <table class="table table-sm align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th style="width:36px;"></th>
+                                        <th>Produk</th>
+                                        <th style="width:110px;">Qty Dikirim</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="shipItemsBody">
+                                    <tr id="shipItemsPlaceholder"><td colspan="3" class="text-center text-muted py-3 small">Pilih transaksi terlebih dahulu untuk memuat barang.</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <hr>
+                        <label class="form-label small fw-semibold">Keterangan (opsional)</label>
+                        <textarea class="form-control" id="shipNote" rows="2"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
+                <button type="button" class="btn btn-primary" id="btnSaveShip"><i class="bi bi-check2 me-1"></i>Simpan Pengiriman</button>
+            </div>
         </div>
     </div>
 </div>
@@ -108,6 +197,123 @@ $(function () {
     }
 
     load();
+
+    // ---------------------------------------------------------------
+    // Modal: Tambah Pengiriman
+    // ---------------------------------------------------------------
+    function showAlert(message, type) {
+        $('#alertPlaceholder').html('<div class="alert alert-' + type + ' alert-dismissible fade show">' + message + '<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>');
+    }
+
+    $('#shipTrx').on('change', function () {
+        var idTrx = $(this).val();
+        var $body = $('#shipItemsBody');
+
+        if (!idTrx) {
+            $body.html('<tr><td colspan="3" class="text-center text-muted py-3 small">Pilih transaksi terlebih dahulu untuk memuat barang.</td></tr>');
+            return;
+        }
+
+        $body.html('<tr><td colspan="3" class="text-center py-3"><div class="spinner-border spinner-border-sm"></div></td></tr>');
+
+        $.ajax({ url: BASE_URL + 'transaction_items/' + idTrx, method: 'POST', dataType: 'json' })
+            .done(function (res) {
+                var rows = (res && res.data) || [];
+                if (rows.length === 0) {
+                    $body.html('<tr><td colspan="3" class="text-center text-muted py-3 small">Transaksi ini belum punya barang.</td></tr>');
+                    return;
+                }
+                $body.empty();
+                rows.forEach(function (row) {
+                    var tr = $('<tr>');
+                    tr.append('<td class="text-center"><input type="checkbox" class="form-check-input ship-item-check" checked data-id-product="' + row.id_product + '"></td>');
+                    tr.append('<td>' + escapeHtml(row.i_product) + ' - ' + escapeHtml(row.e_product) + '</td>');
+                    tr.append('<td><input type="number" class="form-control form-control-sm ship-item-qty" value="' + row.n_qty + '" min="1" max="' + row.n_qty + '"></td>');
+                    $body.append(tr);
+                });
+            })
+            .fail(function () {
+                $body.html('<tr><td colspan="3" class="text-center text-danger py-3 small">Gagal memuat barang transaksi.</td></tr>');
+            });
+    });
+
+    $('#addShipModal').on('show.bs.modal', function () {
+        $('#addShipAlert').empty();
+        $('#shipCourier').val('');
+        $('#shipResi').val('');
+        $('#shipStatus').val('Dikemas');
+        $('#shipNote').val('');
+        $('#shipItemsBody').html('<tr id="shipItemsPlaceholder"><td colspan="3" class="text-center text-muted py-3 small">Pilih transaksi terlebih dahulu untuk memuat barang.</td></tr>');
+
+        var presetTrx = $(this).data('preset-trx');
+        if (presetTrx) {
+            $('#shipTrx').val(presetTrx).trigger('change');
+            $(this).removeData('preset-trx');
+        } else {
+            $('#shipTrx').val('');
+        }
+    });
+
+    // Dibuka lewat link dari halaman detail transaksi: ?id_transaction=123
+    var presetIdTrx = new URLSearchParams(window.location.search).get('id_transaction');
+    if (presetIdTrx) {
+        $('#addShipModal').data('preset-trx', presetIdTrx);
+        var modal = new bootstrap.Modal(document.getElementById('addShipModal'));
+        modal.show();
+    }
+
+    $('#btnSaveShip').on('click', function () {
+        var idTrx = $('#shipTrx').val();
+        var idCourier = $('#shipCourier').val();
+        var resi = $('#shipResi').val().trim();
+
+        if (!idTrx || !idCourier || !resi) {
+            $('#addShipAlert').html('<div class="alert alert-danger py-2">Transaksi, kurir, dan no resi wajib diisi.</div>');
+            return;
+        }
+
+        var items = [];
+        $('#shipItemsBody tr').each(function () {
+            var $tr = $(this);
+            var $check = $tr.find('.ship-item-check');
+            if ($check.length && $check.is(':checked')) {
+                var qty = parseInt($tr.find('.ship-item-qty').val(), 10) || 0;
+                if (qty > 0) {
+                    items.push({ id_product: $check.data('id-product'), qty: qty });
+                }
+            }
+        });
+
+        if (items.length === 0) {
+            $('#addShipAlert').html('<div class="alert alert-danger py-2">Pilih minimal 1 barang yang dikirim.</div>');
+            return;
+        }
+
+        var $btn = $('#btnSaveShip');
+        $btn.prop('disabled', true);
+
+        $.ajax({
+            url: BASE_URL + 'create',
+            method: 'POST',
+            dataType: 'json',
+            data: {
+                id_transaction: idTrx,
+                id_courier: idCourier,
+                i_resi: resi,
+                e_status_kirim: $('#shipStatus').val(),
+                e_keterangan: $('#shipNote').val(),
+                items: items
+            }
+        }).done(function () {
+            $('#addShipModal').modal('hide');
+            showAlert('Pengiriman berhasil dibuat.', 'success');
+            load();
+        }).fail(function (xhr) {
+            $('#addShipAlert').html('<div class="alert alert-danger py-2">' + ((xhr.responseJSON && xhr.responseJSON.message) || 'Gagal menyimpan pengiriman.') + '</div>');
+        }).always(function () {
+            $btn.prop('disabled', false);
+        });
+    });
 });
 </script>
 </body>

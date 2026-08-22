@@ -44,4 +44,13 @@ class User_model extends CI_Model {
         );
         return $this->db->insert('mst_user', $data);
     }
+
+    // Daftar konsumen (bukan admin) untuk dropdown "Tambah Transaksi"
+    public function get_all_customers()
+    {
+        $this->db->where('i_username !=', 'admin');
+        $this->db->where('f_active', 't');
+        $this->db->order_by('i_username', 'ASC');
+        return $this->db->get('mst_user')->result_array();
+    }
 }
