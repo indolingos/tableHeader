@@ -59,12 +59,14 @@ function nav_active($key, $active) {
                 </li>
 
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle<?= nav_active('cart', $active) . nav_active('transaction', $active); ?>" href="#" data-bs-toggle="dropdown" aria-expanded="false">
+                    <a class="nav-link dropdown-toggle<?= nav_active('cart', $active) . nav_active('transaction', $active) . nav_active('retur', $active) . nav_active('banner', $active); ?>" href="#" data-bs-toggle="dropdown" aria-expanded="false">
                         <i class="bi bi-cart-check me-1"></i>Penjualan
                     </a>
                     <ul class="dropdown-menu">
                         <li><a class="dropdown-item" href="<?= site_url('cart'); ?>"><i class="bi bi-basket me-2"></i>Order Online</a></li>
                         <li><a class="dropdown-item" href="<?= site_url('transaction'); ?>"><i class="bi bi-receipt me-2"></i>Daftar Transaksi</a></li>
+                        <li><a class="dropdown-item" href="<?= site_url('retur'); ?>"><i class="bi bi-arrow-return-left me-2"></i>Retur &amp; Refund</a></li>
+                        <li><a class="dropdown-item" href="<?= site_url('banner'); ?>"><i class="bi bi-image me-2"></i>Banner Promo</a></li>
                     </ul>
                 </li>
 
@@ -78,12 +80,13 @@ function nav_active($key, $active) {
                 </li>
 
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle<?= nav_active('address', $active) . nav_active('bank_account', $active); ?>" href="#" data-bs-toggle="dropdown" aria-expanded="false">
+                    <a class="nav-link dropdown-toggle<?= nav_active('address', $active) . nav_active('bank_account', $active) . nav_active('review', $active); ?>" href="#" data-bs-toggle="dropdown" aria-expanded="false">
                         <i class="bi bi-people me-1"></i>Pelanggan
                     </a>
                     <ul class="dropdown-menu">
                         <li><a class="dropdown-item" href="<?= site_url('address'); ?>"><i class="bi bi-geo-alt me-2"></i>Daftar Alamat</a></li>
                         <li><a class="dropdown-item" href="<?= site_url('bank_account'); ?>"><i class="bi bi-credit-card me-2"></i>Daftar Rekening</a></li>
+                        <li><a class="dropdown-item" href="<?= site_url('review'); ?>"><i class="bi bi-star me-2"></i>Review Produk</a></li>
                     </ul>
                 </li>
 
