@@ -1,5 +1,6 @@
 -- =====================================================================
--- FINAL DATA CONSISTENCY FIX v2.2 — PostgreSQL
+-- FINAL DATA CONSISTENCY FIX v2.3 — PostgreSQL
+-- Re-commit refresh: same repair logic, new repository update trigger.
 -- Run this AFTER the existing schema files.
 -- Safe to rerun: UPDATE/INSERT only, no DROP/TRUNCATE/DELETE.
 -- =====================================================================
