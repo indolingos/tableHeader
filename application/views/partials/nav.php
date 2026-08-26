@@ -31,7 +31,7 @@ function nav_soon($label, $icon) {
 
                 <!-- ============================== MASTER ============================== -->
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle<?= nav_active('product', $active) . nav_active('product_type', $active); ?>" href="#" data-bs-toggle="dropdown">
+                    <a class="nav-link dropdown-toggle<?= nav_active('product', $active) . nav_active('product_type', $active) . nav_active('brand', $active); ?>" href="#" data-bs-toggle="dropdown">
                         <i class="bi bi-database me-1"></i>Master
                     </a>
                     <ul class="dropdown-menu dropdown-menu-scrollable" style="max-height: 75vh; overflow-y: auto;">
@@ -40,7 +40,7 @@ function nav_soon($label, $icon) {
                         <li><a class="dropdown-item" href="<?= site_url('product'); ?>"><i class="bi bi-list-ul me-2"></i>Produk</a></li>
                         <li><a class="dropdown-item" href="<?= site_url('product_type'); ?>"><i class="bi bi-diagram-3 me-2"></i>Kategori Produk</a></li>
                         <?= nav_soon('Sub Kategori Produk', 'bi-diagram-2'); ?>
-                        <?= nav_soon('Brand', 'bi-award'); ?>
+                        <li><a class="dropdown-item" href="<?= site_url('brand'); ?>"><i class="bi bi-award me-2"></i>Brand</a></li>
                         <?= nav_soon('Series / Tipe', 'bi-tags'); ?>
                         <?= nav_soon('Variasi Produk (Warna/Ukuran)', 'bi-palette'); ?>
                         <?= nav_soon('Atribut Kategori (EAV)', 'bi-sliders'); ?>
