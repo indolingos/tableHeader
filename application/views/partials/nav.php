@@ -12,7 +12,21 @@ function nav_soon($label, $icon) {
         . '<span class="badge bg-secondary ms-2">Segera</span></a></li>';
 }
 ?>
-<nav class="navbar navbar-dark bg-dark mb-4 navbar-expand-lg">
+<style>
+    /* Keep long Master menus usable without covering most of the page. */
+    .dropdown-menu-scrollable {
+        max-height: min(60vh, 560px) !important;
+        max-width: min(420px, calc(100vw - 2rem));
+        overflow-x: hidden;
+        overflow-y: auto;
+    }
+
+    .dropdown-menu-scrollable .dropdown-item {
+        white-space: normal;
+    }
+</style>
+
+<nav class="navbar navbar-dark bg-dark mb-4 navbar-expand-lg" id="mainNavbar">
     <div class="container-fluid">
         <a class="navbar-brand mb-0" href="<?= site_url('home'); ?>">
             <i class="bi bi-shop me-2"></i>Online Shop
@@ -31,10 +45,10 @@ function nav_soon($label, $icon) {
 
                 <!-- ============================== MASTER ============================== -->
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle<?= nav_active('product', $active) . nav_active('product_type', $active) . nav_active('brand', $active); ?>" href="#" data-bs-toggle="dropdown">
+                    <a class="nav-link dropdown-toggle<?= nav_active('product', $active) . nav_active('product_type', $active) . nav_active('brand', $active); ?>" href="#" data-bs-toggle="dropdown" data-bs-auto-close="true" aria-expanded="false">
                         <i class="bi bi-database me-1"></i>Master
                     </a>
-                    <ul class="dropdown-menu dropdown-menu-scrollable" style="max-height: 75vh; overflow-y: auto;">
+                    <ul class="dropdown-menu dropdown-menu-scrollable">
 
                         <li><h6 class="dropdown-header">Produk</h6></li>
                         <li><a class="dropdown-item" href="<?= site_url('product'); ?>"><i class="bi bi-list-ul me-2"></i>Produk</a></li>
@@ -173,3 +187,21 @@ function nav_soon($label, $icon) {
         </div>
     </div>
 </nav>
+
+<script>
+(function () {
+    function closeOpenDropdowns(event) {
+        var navbar = document.getElementById('mainNavbar');
+        if (!navbar || navbar.contains(event.target)) return;
+
+        navbar.querySelectorAll('.dropdown-menu.show').forEach(function (menu) {
+            var toggle = menu.parentElement.querySelector('[data-bs-toggle="dropdown"]');
+            if (!toggle || !window.bootstrap) return;
+            var instance = bootstrap.Dropdown.getInstance(toggle);
+            if (instance) instance.hide();
+        });
+    }
+
+    document.addEventListener('click', closeOpenDropdowns);
+})();
+</script>
