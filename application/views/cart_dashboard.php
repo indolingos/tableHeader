@@ -147,7 +147,7 @@ $(function () {
             var btnGroup = $('<div class="d-inline-flex gap-1">');
             var viewBtn = $('<a class="btn btn-sm btn-outline-primary btn-icon" title="Lihat detail di halaman baru"><i class="bi bi-eye"></i></a>');
             viewBtn.attr('href', BASE_URL + 'user_detail/' + row.id_user);
-            viewBtn.attr('target', '_blank');
+            viewBtn.attr('target');
             var downloadBtn = $('<a class="btn btn-sm btn-outline-success btn-icon" title="Download data pembelian"><i class="bi bi-download"></i></a>');
             downloadBtn.attr('href', BASE_URL + 'export_user/' + row.id_user);
             btnGroup.append(viewBtn).append(downloadBtn);

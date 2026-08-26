@@ -147,7 +147,7 @@
                     <h6 class="mb-1"><i class="bi bi-truck me-2"></i>Histori Pengiriman</h6>
                     <p class="text-muted small mb-0">Keterangan: satu transaksi bisa memiliki lebih dari satu pengiriman jika barang dikirim bertahap.</p>
                 </div>
-                <a class="btn btn-primary btn-sm text-nowrap" id="btnAddShipment" target="_blank">
+                <a class="btn btn-primary btn-sm text-nowrap" id="btnAddShipment">
                     <i class="bi bi-plus-lg me-1"></i>Tambah Pengiriman
                 </a>
             </div>
@@ -246,7 +246,7 @@ $(function () {
             tr.append('<td>' + formatDate(row.dt_diterima) + '</td>');
             var td = $('<td class="text-center">');
             var a = $('<a class="btn btn-sm btn-outline-primary" title="Lihat bukti kirim"><i class="bi bi-eye"></i></a>');
-            a.attr('href', '<?= site_url('shipment/detail/'); ?>' + row.id_shipment).attr('target', '_blank');
+            a.attr('href', '<?= site_url('shipment/detail/'); ?>' + row.id_shipment).attr('target');
             td.append(a);
             tr.append(td);
             $body.append(tr);

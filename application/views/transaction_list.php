@@ -238,7 +238,7 @@ $(function () {
 
             var actionTd = $('<td class="text-center">');
             var viewBtn = $('<a class="btn btn-sm btn-outline-primary btn-icon" title="Lihat detail transaksi"><i class="bi bi-eye"></i></a>');
-            viewBtn.attr('href', BASE_URL + 'detail/' + row.id_transaction).attr('target', '_blank');
+            viewBtn.attr('href', BASE_URL + 'detail/' + row.id_transaction).attr('target');
             actionTd.append(viewBtn);
             tr.append(actionTd);
 

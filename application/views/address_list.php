@@ -79,7 +79,7 @@ $(function () {
             tr.append('<td class="text-end">' + row.n_address + '</td>');
             var actionTd = $('<td class="text-center">');
             var viewBtn = $('<a class="btn btn-sm btn-outline-primary btn-icon" title="Lihat detail alamat"><i class="bi bi-eye"></i></a>');
-            viewBtn.attr('href', BASE_URL + 'user_detail/' + row.id_user).attr('target', '_blank');
+            viewBtn.attr('href', BASE_URL + 'user_detail/' + row.id_user).attr('target');
             actionTd.append(viewBtn);
             tr.append(actionTd);
             $body.append(tr);

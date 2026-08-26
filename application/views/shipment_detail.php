@@ -25,7 +25,7 @@
         <a href="<?= site_url('shipment'); ?>" class="btn btn-sm btn-outline-secondary">
             <i class="bi bi-arrow-left me-1"></i>Kembali ke Bukti Barang Terkirim
         </a>
-        <a href="<?= site_url('transaction/detail/' . (int) $shipment['id_transaction']); ?>" class="btn btn-sm btn-outline-primary" target="_blank">
+        <a href="<?= site_url('transaction/detail/' . (int) $shipment['id_transaction']); ?>" class="btn btn-sm btn-outline-primary">
             <i class="bi bi-receipt me-1"></i>Lihat Transaksi <?= htmlspecialchars($shipment['i_invoice']); ?>
         </a>
     </div>

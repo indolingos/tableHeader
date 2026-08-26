@@ -5,6 +5,27 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>lvens — Photography</title>
 <meta name="description" content="lvens — personal photography hobby gallery, shot on phone.">
+<meta name="theme-color" content="#0c0c0b">
+<meta name="color-scheme" content="dark">
+
+<!-- Social share preview. og:image is a relative path for now — once
+     this is live at a real URL, swap it for the full absolute URL
+     (e.g. https://yoursite.com/images/hero.jpg) so previews on
+     Instagram/iMessage/etc. can actually resolve the image. -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="lvens — Photography">
+<meta property="og:description" content="A hobbyist eye, one year in. Shot on phone, still learning as I go.">
+<meta property="og:image" content="images/hero.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="lvens — Photography">
+<meta name="twitter:description" content="A hobbyist eye, one year in. Shot on phone, still learning as I go.">
+<meta name="twitter:image" content="images/hero.jpg">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<!-- Minimal aperture mark as a favicon — no external file needed. -->
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%230c0c0b'/%3E%3Ccircle cx='50' cy='50' r='30' fill='none' stroke='%236d8f80' stroke-width='7'/%3E%3Ccircle cx='50' cy='50' r='9' fill='%236d8f80'/%3E%3C/svg%3E">
 
 <!--
   ============================================================
@@ -836,50 +857,67 @@ body:not(.pl-done) #page{ opacity:0; }
     });
 
     function open(){
-      if(imgCache[img.getAttribute('data-src')] === false) return; /* broken file, nothing to show */
       var full = img.getAttribute('data-src');
-      lbImg.src = full;
+      if(imgCache[full] === false) return; /* broken file, nothing to show */
       lbCap.textContent = 'lvens — ' + num;
+      lbImg.alt = 'lvens — ' + num;
       lightbox.classList.add('on');
+      /* this tile's photo should already be loading via the scroll
+         observer below, but cover the edge case (e.g. keyboard focus
+         jumping straight to a tile that hasn't scrolled into view yet)
+         and hand the lightbox the full image the moment it's ready */
+      lazyLoad(img, function(){ tile.querySelector('.ph').style.display = 'none'; });
+      preload(full).then(function(){
+        if(imgCache[full] !== false) lbImg.src = full;
+      });
     }
     tile.addEventListener('click', open);
     tile.addEventListener('keydown', function(e){ if(e.key === 'Enter') open(); });
   });
 
-  /* ---------- preload everything up front, then reveal all at once ----------
-     This is the "keep loading until it's all ready" behaviour: the page
-     stays behind the preloader screen (with a live progress bar) until
-     the hero, the about portrait, and all 141 grid photos have finished
-     loading — so once you can scroll, nothing pops in or flickers. */
-  var allSources = [heroImg.getAttribute('data-src'), aboutImg.getAttribute('data-src')]
-    .concat(WORK.map(function(item){ return 'images/' + item.file; }));
-
+  /* ---------- preload just the hero, then reveal the page ----------
+     Only the hero shot blocks the preloader now. The about portrait and
+     all 141 grid photos lazy-load individually as they scroll near the
+     viewport (see the IntersectionObserver below) instead — with a real
+     set of 141 phone photos, waiting for every file up front could mean
+     hundreds of MB before a visitor sees anything. A short timeout also
+     guarantees the page reveals itself even if the hero file is slow,
+     huge, or still the placeholder name. */
   var plFill = document.getElementById('plFill');
   var plPct = document.getElementById('plPct');
-  var doneCount = 0;
-  var total = allSources.length;
+  if(plFill) plFill.style.width = '25%';
 
-  function bumpProgress(){
-    doneCount++;
-    var pct = Math.round((doneCount / total) * 100);
-    if(plFill) plFill.style.width = pct + '%';
-    if(plPct) plPct.textContent = 'Loading ' + pct + '%';
-  }
-
-  Promise.all(allSources.map(function(src){
-    return preload(src).then(bumpProgress);
-  })).then(function(){
-    /* reveal hero + about */
+  var revealed = false;
+  function revealPage(){
+    if(revealed) return;
+    revealed = true;
+    if(plFill) plFill.style.width = '100%';
+    if(plPct) plPct.textContent = 'Loading 100%';
     applyLoaded(heroImg, function(){ document.getElementById('heroMedia').classList.remove('ph'); });
-    applyLoaded(aboutImg, function(){ aboutImg.closest('.about-media').querySelector('.ph').style.display='none'; });
-    /* reveal every grid tile — all already sitting in the image cache,
-       so this is a paint, not a fetch */
-    tiles.forEach(function(tile){
-      var img = tile.querySelector('img');
-      applyLoaded(img, function(){ tile.querySelector('.ph').style.display='none'; });
-    });
     document.body.classList.add('pl-done');
-  });
+  }
+  preload(heroImg.getAttribute('data-src')).then(revealPage);
+  setTimeout(revealPage, 4000); /* safety net so a slow/missing hero never strands visitors */
+
+  /* ---------- lazy-load the about portrait + every grid photo ----------
+     Each image starts loading (and blurs up) only once it scrolls within
+     ~600px of the viewport, instead of downloading the whole set at once. */
+  function lazyLoad(img, onOk){
+    preload(img.getAttribute('data-src')).then(function(){ applyLoaded(img, onOk); });
+  }
+  var lazyIO = new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      if(!entry.isIntersecting) return;
+      lazyIO.unobserve(entry.target);
+      var container = entry.target;
+      var img = container.querySelector('img');
+      var ph = container.querySelector('.ph');
+      lazyLoad(img, function(){ if(ph) ph.style.display = 'none'; });
+    });
+  }, { rootMargin: '600px' });
+
+  lazyIO.observe(aboutImg.closest('.about-media'));
+  tiles.forEach(function(tile){ lazyIO.observe(tile); });
 
   /* ---------- image save/right-click protection ---------- */
   /* Deters casual "save image as" / drag-out-to-desktop / long-press-save.
