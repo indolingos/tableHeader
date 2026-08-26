@@ -1,5 +1,5 @@
 -- =====================================================================
--- FINAL DATA CONSISTENCY FIX v2.1 — PostgreSQL
+-- FINAL DATA CONSISTENCY FIX v2.2 — PostgreSQL
 -- Run this AFTER the existing schema files.
 -- Safe to rerun: UPDATE/INSERT only, no DROP/TRUNCATE/DELETE.
 -- =====================================================================
@@ -31,13 +31,15 @@ UPDATE mst_user SET i_username = 'Xiao',        e_name = 'Xiao'          WHERE i
 UPDATE mst_user SET i_username = 'Diluc',       e_name = 'Diluc'         WHERE id_user = 19;
 UPDATE mst_user SET i_username = 'Cyno',        e_name = 'Cyno'          WHERE id_user = 20;
 
--- Any additional users not explicitly mapped above get a safe display name
--- derived from their username, while never producing NULL.
+-- Do not rewrite usernames for IDs above 20 here. The database enforces a
+-- UNIQUE constraint on i_username, and the existing seed may already contain
+-- a case variant such as "cyno". Only fill a missing display name safely.
 UPDATE mst_user
-SET i_username = INITCAP(REPLACE(TRIM(i_username), '_', ' ')),
-    e_name = COALESCE(NULLIF(TRIM(e_name), ''), INITCAP(REPLACE(TRIM(i_username), '_', ' ')))
-WHERE id_user > 20
-  AND LOWER(i_username) <> 'admin';
+SET e_name = COALESCE(
+    NULLIF(TRIM(e_name), ''),
+    INITCAP(REPLACE(TRIM(i_username), '_', ' '))
+)
+WHERE id_user > 20;
 
 -- ---------------------------------------------------------------------
 -- 2) Every address recipient follows the owner in mst_user.
