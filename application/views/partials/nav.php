@@ -190,18 +190,46 @@ function nav_soon($label, $icon) {
 
 <script>
 (function () {
-    function closeOpenDropdowns(event) {
-        var navbar = document.getElementById('mainNavbar');
-        if (!navbar || navbar.contains(event.target)) return;
+    var navbar = document.getElementById('mainNavbar');
+    if (!navbar) return;
 
-        navbar.querySelectorAll('.dropdown-menu.show').forEach(function (menu) {
-            var toggle = menu.parentElement.querySelector('[data-bs-toggle="dropdown"]');
-            if (!toggle || !window.bootstrap) return;
-            var instance = bootstrap.Dropdown.getInstance(toggle);
-            if (instance) instance.hide();
-        });
+    function getOpenDropdowns() {
+        return navbar.querySelectorAll('.dropdown-menu.show');
     }
 
-    document.addEventListener('click', closeOpenDropdowns);
+    function hideDropdown(menu) {
+        var toggle = menu.parentElement.querySelector('[data-bs-toggle="dropdown"]');
+        if (toggle && window.bootstrap) {
+            var instance = bootstrap.Dropdown.getInstance(toggle);
+            if (instance) {
+                instance.hide();
+                return;
+            }
+        }
+
+        menu.classList.remove('show');
+        if (toggle) toggle.setAttribute('aria-expanded', 'false');
+    }
+
+    function closeAllDropdowns() {
+        getOpenDropdowns().forEach(hideDropdown);
+    }
+
+    // Moving from the navbar into the page should immediately uncover the page.
+    navbar.querySelectorAll('.nav-item.dropdown').forEach(function (dropdown) {
+        dropdown.addEventListener('mouseleave', function () {
+            window.setTimeout(function () {
+                if (!dropdown.matches(':hover')) hideDropdown(dropdown.querySelector('.dropdown-menu'));
+            }, 80);
+        });
+    });
+
+    // Scrolling means the user is interacting with the page; don't leave a menu floating over it.
+    window.addEventListener('scroll', closeAllDropdowns, { passive: true });
+
+    // Keep Bootstrap's normal click-away behavior, with a fallback for cached/older Bootstrap state.
+    document.addEventListener('click', function (event) {
+        if (!navbar.contains(event.target)) closeAllDropdowns();
+    }, true);
 })();
 </script>
