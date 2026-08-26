@@ -6,20 +6,24 @@ class Product_model extends CI_Model {
     public function get_all($search = null, $include_inactive = false)
     {
         $this->db->distinct();
-        $this->db->select('mst_product.*, mst_category.e_category');
+        $this->db->select('mst_product.*, mst_category.e_category,
+                            mst_brand.e_brand,
+                            mst_unit.e_unit');
         $this->db->from('mst_product');
         $this->db->join('mst_category', 'mst_category.id_category = mst_product.id_category', 'left');
+        $this->db->join('mst_brand', 'mst_brand.id_brand = mst_product.id_brand', 'left');
+        $this->db->join('mst_unit', 'mst_unit.id_unit = mst_product.id_unit', 'left');
 
         if (!$include_inactive) {
             $this->db->where('mst_product.f_active', 't');
         }
 
         if ($search !== null && $search !== '') {
-            $search = strtolower(trim($search)); 
-
+            $search = strtolower(trim($search));
             $this->db->group_start();
             $this->db->like('LOWER(mst_product.i_product)', $search);
             $this->db->or_like('LOWER(mst_product.e_product)', $search);
+            $this->db->or_like('LOWER(mst_brand.e_brand)', $search);
             $this->db->group_end();
         }
 
@@ -30,9 +34,13 @@ class Product_model extends CI_Model {
     public function get_all_with_inactive()
     {
         $this->db->distinct();
-        $this->db->select('mst_product.*, mst_category.e_category');
+        $this->db->select('mst_product.*, mst_category.e_category,
+                            mst_brand.e_brand,
+                            mst_unit.e_unit');
         $this->db->from('mst_product');
         $this->db->join('mst_category', 'mst_category.id_category = mst_product.id_category', 'left');
+        $this->db->join('mst_brand', 'mst_brand.id_brand = mst_product.id_brand', 'left');
+        $this->db->join('mst_unit', 'mst_unit.id_unit = mst_product.id_unit', 'left');
         $this->db->order_by('mst_product.id_product', 'ASC');
         return $this->db->get()->result_array();
     }
@@ -50,9 +58,13 @@ class Product_model extends CI_Model {
 
     public function get_by_id($id)
     {
-        $this->db->select('mst_product.*, mst_category.e_category');
+        $this->db->select('mst_product.*, mst_category.e_category,
+                            mst_brand.e_brand,
+                            mst_unit.e_unit');
         $this->db->from('mst_product');
         $this->db->join('mst_category', 'mst_category.id_category = mst_product.id_category', 'left');
+        $this->db->join('mst_brand', 'mst_brand.id_brand = mst_product.id_brand', 'left');
+        $this->db->join('mst_unit', 'mst_unit.id_unit = mst_product.id_unit', 'left');
         $this->db->where('mst_product.id_product', $id);
         return $this->db->get()->row_array();
     }
@@ -95,9 +107,13 @@ class Product_model extends CI_Model {
 
     public function get_by_kode($i_product)
     {
-        $this->db->select('mst_product.*, mst_category.e_category');
+        $this->db->select('mst_product.*, mst_category.e_category,
+                            mst_brand.e_brand,
+                            mst_unit.e_unit');
         $this->db->from('mst_product');
         $this->db->join('mst_category', 'mst_category.id_category = mst_product.id_category', 'left');
+        $this->db->join('mst_brand', 'mst_brand.id_brand = mst_product.id_brand', 'left');
+        $this->db->join('mst_unit', 'mst_unit.id_unit = mst_product.id_unit', 'left');
         $this->db->where('mst_product.i_product', $i_product);
         $this->db->where('mst_product.f_active', 't');
         return $this->db->get()->row_array();
